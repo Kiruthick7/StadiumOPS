@@ -49,7 +49,7 @@ export function EventFeed({ alerts, fullHeight = false }: Props) {
             <p className="text-xs text-zinc-500">No active events</p>
           </div>
         ) : (
-          alerts.slice().reverse().map((alert) => {
+          alerts.map((alert) => {
             const isResolved = alert.resolved || resolving.has(alert.id);
             return (
               <div key={alert.id} className={clsx(

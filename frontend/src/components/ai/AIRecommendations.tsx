@@ -60,7 +60,7 @@ export function AIRecommendations({ recommendations, onRefresh, isRefreshing, ai
             <p className="text-xs">All active recommendations addressed.<br/>Operations nominal.</p>
           </div>
         ) : (
-          recommendations.map((rec) => (
+          recommendations.slice().reverse().map((rec) => (
             <div key={rec.id} className={clsx(
               "rounded-md bg-surface-0 border flex flex-col overflow-hidden relative shadow-sm",
               rec.source === 'ai' ? "border-slate-700/50" : "border-amber-700/50"
