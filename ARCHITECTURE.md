@@ -23,3 +23,38 @@ The system is built on the principles of **resilience, simplicity, and operation
 - **Backend**: Containerized with a slim Docker image, deployed to Google Cloud Run. Scale-to-zero enabled for cost efficiency.
 - **Frontend**: Built as static assets (`npm run build`) and deployed to Firebase Hosting.
 - **Benefits**: Extremely low operational overhead, virtually free when idle, infinite scalability during high traffic.
+
+                ┌──────────────────────────┐
+                │   Stadium Operators      │
+                │ Security / Volunteers    │
+                └────────────┬─────────────┘
+                             │
+                             ▼
+                ┌──────────────────────────-┐
+                │ React Operations Dashboard│
+                │  (Firebase Hosting)       │
+                └────────────┬─────────────-┘
+                             │
+                     Poll Every 2–3 sec
+                             │
+                             ▼
+                ┌──────────────────────────┐
+                │ FastAPI Backend          │
+                │  (Google Cloud Run)      │
+                └────────────┬─────────────┘
+                             │
+        ┌────────────────────┼────────────────────┐
+        │                    │                    │
+        ▼                    ▼                    ▼
+┌────────────────┐  ┌────────────────┐  ┌────────────────-┐
+│ Operational    │  │ Simulation API │  │ Groq AI Engine  │
+│ State Engine   │  │ Trigger Engine │  │ Recommendations │
+└────────────────┘  └────────────────┘  └────────────────-┘
+        │                    │                    │
+        └────────────────────┼────────────────────┘
+                             │
+                             ▼
+                ┌──────────────────────────┐
+                │ Realtime Dashboard State │
+                │ Alerts / Routing / Risks │
+                └──────────────────────────┘
