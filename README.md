@@ -57,12 +57,16 @@ gcloud run deploy stadium-ops-backend \
   --platform managed \
   --region us-central1 \
   --allow-unauthenticated \
-  --set-env-vars GROQ_API_KEY=your_api_key_here
+  --set-env-vars GROQ_API_KEY=your_api_key_here,CORS_ORIGINS="http://localhost:5173,http://localhost:3000,https://your-frontend-domain.web.app"
 ```
 
 ### Deploying Frontend to Firebase Hosting
 
-The frontend is pre-configured with `firebase.json` for static hosting. Ensure you update `VITE_API_URL` to point to your new Cloud Run service URL.
+The frontend is pre-configured with `firebase.json` for static hosting. Before building, create a `.env.production` file in the `frontend` folder and set your Cloud Run URL:
+
+```env
+VITE_API_URL=https://stadium-ops-backend-xxxxxx.a.run.app
+```
 
 ```bash
 cd frontend
