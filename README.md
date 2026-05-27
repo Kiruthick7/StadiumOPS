@@ -1,18 +1,103 @@
-# Stadium OPS — AI-Assisted Stadium Operations Platform
+# StadiumOPS — AI-Assisted Stadium Operations Platform
 
-Stadium OPS is a real-time command platform for crowd coordination, congestion prediction, and emergency response during large cricket matches. Designed specifically as a hackathon-grade production-style system for Google Cloud’s “Build with AI – Agentic Premier League”.
+> **🏆 Top 15 Finalist — Google Agentic Premier League (Multicity, 2026)**  
+> Built for Google Cloud's *"Build with AI – Agentic Premier League"* national hackathon.
+
+---
+
+Stadium OPS is a **real-time AI command platform** for crowd coordination, congestion prediction, and emergency response during large-scale cricket matches. It combines LLM-powered operational intelligence with a deterministic fallback engine — designed to stay functional even when AI inference is unavailable.
+
+**Live Problem:** Stadium operators at IPL-scale events (60,000+ capacity) have no unified real-time system to coordinate zone congestion, gate routing, and emergency dispatch. Most operations run on walkie-talkies and manual coordination.
+
+**What StadiumOPS solves:** A single command-center dashboard that gives operators AI-generated action recommendations for any scenario, backed by a rules engine that activates automatically when the AI is unavailable.
+
+---
+
+## Architecture
+
+```
+┌─────────────────────────────────────────────────────────┐
+│                    FRONTEND (React + Vite)              │
+│  ┌──────────────┐  ┌──────────────┐  ┌───────────────┐  │
+│  │ Command      │  │ Stadium SVG  │  │  Alert Feed   │  │
+│  │ Dashboard    │  │ (live zone   │  │  + Actions    │  │
+│  │              │  │  risk color) │  │               │  │
+│  └──────┬───────┘  └──────────────┘  └───────────────┘  │
+│         │ polls every 4s (useStatus hook)               │
+└─────────┼───────────────────────────────────────────────┘
+          │
+          ▼
+┌─────────────────────────────────────────────────────────┐
+│               BACKEND (FastAPI + Uvicorn)               │
+│                                                         │
+│  ┌────────────────────────────────────────────────────┐ │
+│  │              Operational State                     │ │
+│  │  (in-memory singleton → swap to Redis/Firestore)   │ │
+│  └──────────────────┬─────────────────────────────────┘ │
+│                     │                                   │
+│     ┌───────────────┼───────────────────┐               │
+│     ▼               ▼                   ▼               │
+│  ┌──────────┐  ┌──────────┐  ┌──────────────────────┐   │
+│  │Simulation│  │ AI Layer │  │  Fallback Rules      │   │
+│  │ Engine   │  │ (Groq /  │  │  Engine              │   │
+│  │          │  │ LLaMA 3) │  │  (deterministic)     │   │
+│  └──────────┘  └──────────┘  └──────────────────────┘   │
+└─────────────────────────────────────────────────────────┘
+          │
+          ▼  (Cloud Run ready)
+┌──────────────────┐
+│    Groq API      │
+│  (LLaMA 3 fast   │
+│   inference)     │
+└──────────────────┘
+```
+
+**Key architectural decision:** Polling over WebSockets — chosen for hackathon reliability and simplicity. The 4-second polling interval was tuned to give near-real-time UX without WebSocket connection overhead in an unstable demo environment. The architecture doc explicitly notes this as a production tradeoff.
+
+---
 
 ## Features
 
-- **Real-time Monitoring**: Polling-based live dashboard with low-latency updates.
-- **AI Operational Recommendations**: Uses Groq (LLaMA 3) to process operational state and return structured JSON recommendations.
-- **Resilient Fallback Engine**: Deterministic rule-based engine activates automatically if the AI is unavailable or network degrades.
-- **Deterministic Simulation**: A backend-driven simulation engine allows operators to trigger realistic events (congestion, weather, emergencies) with predictable outcomes.
-- **Production UI**: Dark mode command center aesthetic using TailwindCSS and React.
+- **Real-time Command Dashboard** — Live zone status, gate congestion, and crowd density displayed on a dynamic SVG stadium map with risk-based color coding
+- **AI Operational Intelligence** — Groq (LLaMA 3) processes live operational state and returns structured JSON recommendations for operator action
+- **Resilient Fallback Engine** — Deterministic rule-based system activates automatically if AI is unavailable or network degrades — the system never goes dark
+- **Scenario Simulation Engine** — Backend-driven simulation lets operators trigger realistic events (congestion, weather, emergencies) for training and demos
+- **Production-Grade UI** — Dark mode command-center interface built with React 18 + TypeScript + TailwindCSS
+
+---
+
+## Tech Stack
+
+| Layer | Technology | Why |
+|---|---|---|
+| Frontend | React 18 + TypeScript + Vite | Type safety, fast dev loop, production-ready |
+| UI | TailwindCSS 3 + SVG | Custom stadium map with dynamic coloring |
+| Backend | FastAPI + Pydantic + Uvicorn | Async Python, automatic schema validation |
+| AI Inference | Groq API (LLaMA 3) | Fastest open-model inference latency |
+| State | In-memory singleton (Redis-ready) | Hackathon simplicity; swappable in production |
+| Deployment | Cloud Run ready | Stateless backend design enables instant Cloud Run deploy |
+
+---
+
+## Engineering Decisions
+
+**Why polling instead of WebSockets?**  
+In a hackathon demo environment with unreliable network conditions, WebSocket connections create fragile demos. A 4-second polling interval gives operators near-real-time feedback while making the system tolerant to network blips. In production, this would be upgraded to WebSockets or Server-Sent Events.
+
+**Why a fallback rules engine alongside the LLM?**  
+An AI-only system fails silently. Stadium operations cannot tolerate a black box — if the AI is unavailable, operators still need actionable guidance. The rules engine ensures the system degrades gracefully rather than going dark.
+
+**Why Groq + LLaMA 3 instead of OpenAI?**  
+Groq's inference latency (~200ms for LLaMA 3 70B) is roughly 10× faster than GPT-4 at equivalent load. For a real-time operational dashboard where recommendations need to feel instant, this matters.
+
+**Why structured JSON output from the LLM?**  
+The AI is prompted to return structured JSON that directly maps to the UI components. This removes a parsing layer and makes the AI output type-safe via Pydantic models.
+
+---
 
 ## Getting Started
 
-### 1. Backend (FastAPI + Cloud Run ready)
+### Backend (FastAPI + Cloud Run ready)
 
 ```bash
 cd backend
@@ -20,14 +105,15 @@ python -m venv venv
 source venv/bin/activate
 pip install -r requirements.txt
 
-# Add your Groq API key
 cp .env.example .env
-# Edit .env to set GROQ_API_KEY
+# Add your GROQ_API_KEY to .env
 
 uvicorn app.main:app --reload --port 8000
 ```
 
-### 2. Frontend (React + Vite)
+API docs available at `http://localhost:8000/docs`
+
+### Frontend (React + Vite)
 
 ```bash
 cd frontend
@@ -35,51 +121,28 @@ npm install
 npm run dev
 ```
 
-The frontend will start at `http://localhost:5173`.
+Open `http://localhost:5173`
 
-## Architecture Highlights
+---
 
-- **Stateless Backend**: While the demo uses an in-memory singleton for simplicity, the architecture is designed to easily migrate to Redis or Firestore for multi-instance Cloud Run deployments.
-- **Graceful Degradation**: The frontend tracks connection health (Connecting -> Live -> Degraded -> Offline) and the backend falls back to rule-based logic when AI APIs fail.
-- **Explainable AI**: The AI is instructed to return `confidence` scores, `priority` levels, and `reasoning` alongside its recommendations, avoiding the "black box" problem.
+## Project Context
 
-## Deployment
+Built in 4 hours at the **Google Agentic Premier League (Multicity)** — a Google organized national hackathon focused on agentic AI systems. StadiumOPS reached the **Top 15** out of participants across multiple cities.
 
-### Deploying Backend to Cloud Run
+The theme: build an AI agent that solves a real operational problem in real-time. We chose stadium operations because it has genuine scale, genuine stakes (crowd safety), and zero good tooling today.
 
-The backend is fully containerized and ready for Google Cloud Run.
+---
 
-```bash
-cd backend
-gcloud builds submit --tag gcr.io/YOUR_PROJECT_ID/stadium-ops-backend
-gcloud run deploy stadium-ops-backend \
-  --image gcr.io/YOUR_PROJECT_ID/stadium-ops-backend \
-  --platform managed \
-  --region us-central1 \
-  --allow-unauthenticated \
-  --set-env-vars GROQ_API_KEY=your_api_key_here,CORS_ORIGINS="http://localhost:5173,http://localhost:3000,https://your-frontend-domain.web.app"
-```
+## What's Next (Post-Hackathon Roadmap)
 
-### Deploying Frontend to Firebase Hosting
+- [ ] Swap in-memory state for Redis (horizontal scaling)  
+- [ ] Replace polling with Server-Sent Events  
+- [ ] Deploy backend to Google Cloud Run  
+- [ ] Add historical incident logging to BigQuery  
+- [ ] Add multi-stadium support
 
-The frontend is pre-configured with `firebase.json` for static hosting. Before building, create a `.env.production` file in the `frontend` folder and set your Cloud Run URL:
+---
 
-```env
-VITE_API_URL=https://stadium-ops-backend-xxxxxx.a.run.app
-```
+## Author
 
-```bash
-cd frontend
-# Install Firebase CLI if you haven't
-npm install -g firebase-tools
-
-# Login and initialize
-firebase login
-firebase use YOUR_PROJECT_ID
-
-# Build the production assets
-npm run build
-
-# Deploy to Firebase Hosting
-firebase deploy --only hosting
-```
+**Kiruthick B** — [GitHub](https://github.com/Kiruthick7) | [LinkedIn](https://linkedin.com/in/kiruthick)
