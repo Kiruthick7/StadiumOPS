@@ -21,11 +21,11 @@ StadiumOPS gives operators a single command center: live zone status, AI-generat
 ┌──────────────────────────────────────────────────────────────┐
 │                  FRONTEND (React 18 + Vite)                  │
 │                                                              │
-│   ┌─────────────────┐  ┌──────────────────┐  ┌───────────┐  │
-│   │ Command         │  │ Stadium SVG Map   │  │ Alert     │  │
-│   │ Dashboard       │  │ (live zone risk   │  │ Feed +    │  │
-│   │                 │  │  coloring)        │  │ Actions   │  │
-│   └────────┬────────┘  └──────────────────┘  └───────────┘  │
+│   ┌─────────────────┐  ┌──────────────────┐  ┌───────────┐   │
+│   │ Command         │  │ Stadium SVG Map  │  │ Alert     │   │
+│   │ Dashboard       │  │ (live zone risk  │  │ Feed +    │   │
+│   │                 │  │  coloring)       │  │ Actions   │   │
+│   └────────┬────────┘  └──────────────────┘  └───────────┘   │
 │            │  useStatus hook — polls every 4 seconds         │
 └────────────┼─────────────────────────────────────────────────┘
              │
@@ -33,19 +33,19 @@ StadiumOPS gives operators a single command center: live zone status, AI-generat
 ┌──────────────────────────────────────────────────────────────┐
 │               BACKEND (FastAPI + Uvicorn)                    │
 │                                                              │
-│  ┌─────────────────────────────────────────────────────┐    │
-│  │           Operational State                          │    │
-│  │   in-memory singleton → swappable to Redis/Firestore │    │
-│  └──────────────────┬──────────────────────────────────┘    │
+│  ┌─────────────────────────────────────────────────────┐     │
+│  │           Operational State                         │     │
+│  │   in-memory singleton → swappable to Redis/Firestore│     │
+│  └──────────────────┬──────────────────────────────────┘     │
 │                     │                                        │
-│     ┌───────────────┼──────────────────┐                    │
-│     ▼               ▼                  ▼                    │
-│  ┌──────────┐  ┌──────────────┐  ┌───────────────────────┐  │
-│  │Simulation│  │  AI Layer    │  │  Fallback Rules Engine │  │
-│  │ Engine   │  │  Groq API    │  │  (deterministic)       │  │
-│  │          │  │  LLaMA 3     │  │  activates when AI     │  │
-│  └──────────┘  └──────┬───────┘  │  is unavailable        │  │
-│                        │          └───────────────────────┘  │
+│     ┌───────────────┼──────────────────┐                     │
+│     ▼               ▼                  ▼                     │
+│  ┌──────────┐  ┌──────────────┐  ┌───────────────────────┐   │
+│  │Simulation│  │  AI Layer    │  │  Fallback Rules Engine│   │
+│  │ Engine   │  │  Groq API    │  │  (deterministic)      │   │
+│  │          │  │  LLaMA 3     │  │  activates when AI    │   │
+│  └──────────┘  └───────┬──────┘  │  is unavailable       │   │
+│                        │         └───────────────────────┘   │
 └────────────────────────┼─────────────────────────────────────┘
                          │
                          ▼
