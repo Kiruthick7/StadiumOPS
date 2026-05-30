@@ -171,7 +171,7 @@ Dashboard: `http://localhost:5173`
 
 ## Project Context
 
-Built at the **Google Agentic Premier League (Multicity)** — a Google-organized national hackathon across multiple Indian cities focused on building real agentic AI systems. StadiumOPS reached **Top 15** out of participants across all city qualifiers.
+Built during the **Google Agentic Premier League (Multicity)**, where participants were challenged to solve real-world operational problems using AI-powered systems. StadiumOPS reached **Top 15** out of participants across all city qualifiers.
 
 The hackathon theme: build an AI agent that solves a genuine operational problem in real time. Stadium operations were chosen for their scale, real stakes (crowd safety), and absence of any good existing tooling.
 
@@ -257,7 +257,7 @@ Operators can simulate operational scenarios such as weather disruptions, crowd 
 
 - [ ] Swap in-memory state for Redis (enable horizontal scaling)
 - [ ] Replace polling with Server-Sent Events
-- [ ] Deploy backend to Google Cloud Run
+- [ ] Deploy production grade multi-region infrastructure
 - [ ] Add historical incident logging to BigQuery
 - [ ] Multi-stadium support with tenant isolation
 
