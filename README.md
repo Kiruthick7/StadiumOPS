@@ -15,6 +15,16 @@ StadiumOPS gives operators a single command center: live zone status, AI-generat
 
 ---
 
+## Why This Matters
+
+Cricket is one of the most attended sports across India and the Asia-Pacific region, with major matches regularly attracting tens of thousands of spectators.
+
+Managing crowd movement, gate congestion, incident response and operational visibility at this scale remains a complex challenge. Stadium operators often rely on fragmented systems and manual coordination, making it difficult to maintain situational awareness during rapidly evolving situations.
+
+StadiumOPS explores how AI-assisted operational intelligence can help operators detect risks earlier, coordinate responses faster and make more informed decisions during large-scale sporting events while keeping humans in control of final actions.
+
+---
+
 ## Architecture
 
 ```
@@ -70,6 +80,18 @@ StadiumOPS gives operators a single command center: live zone status, AI-generat
 
 ---
 
+## Human-in-the-Loop Design
+
+StadiumOPS was intentionally designed as an AI-assisted system rather than an AI-autonomous system.
+
+The AI layer analyzes operational conditions and provides recommendations, reasoning and confidence scores. However, final decisions always remain with human operators.
+
+This design principle is especially important in safety-critical environments where accountability, context and human judgment remain essential.
+
+To further improve reliability, StadiumOPS includes a deterministic fallback engine that continues providing operational guidance even when AI inference is unavailable.
+
+---
+
 ## Tech Stack
 
 | Layer | Technology | Why |
@@ -80,6 +102,24 @@ StadiumOPS gives operators a single command center: live zone status, AI-generat
 | AI Inference | Groq API (LLaMA 3) | ~200ms p50 latency — fast enough for real-time ops |
 | State | In-memory singleton | Hackathon simplicity; architecture supports Redis/Firestore swap |
 | Deployment | Stateless — Cloud Run ready | No sticky sessions required |
+
+---
+
+## Google Cloud Technologies Used
+
+StadiumOPS was built during the Google Cloud Agentic Premier League and leverages Google Cloud technologies for cloud-native deployment and application infrastructure.
+
+### Technologies Used
+
+- Google Cloud Run
+- Firebase
+- Google Cloud ecosystem
+- React + TypeScript
+- FastAPI
+- Groq API
+- LLaMA 3
+
+The project was designed as a cloud-native application with stateless backend services that can be deployed and scaled using Google Cloud infrastructure.
 
 ---
 
@@ -134,6 +174,82 @@ Dashboard: `http://localhost:5173`
 Built at the **Google Agentic Premier League (Multicity)** — a Google-organized national hackathon across multiple Indian cities focused on building real agentic AI systems. StadiumOPS reached **Top 15** out of participants across all city qualifiers.
 
 The hackathon theme: build an AI agent that solves a genuine operational problem in real time. Stadium operations were chosen for their scale, real stakes (crowd safety), and absence of any good existing tooling.
+
+---
+
+## Impact
+
+StadiumOPS demonstrates how AI can be used as an operational decision-support system for large-scale public events.
+
+By combining real-time telemetry, AI-generated recommendations, and deterministic fallback mechanisms, the platform helps operators:
+
+- Identify operational risks earlier
+- Improve situational awareness
+- Coordinate responses more effectively
+- Maintain resilience during system failures
+
+While built as a hackathon prototype, the concepts explored in StadiumOPS can extend beyond sports venues to concerts, festivals, transportation hubs, and other large public gatherings.
+
+---
+## Screenshots
+
+### Operations Overview Dashboard
+
+Real-time command center displaying occupancy, active alerts, weather conditions, system health, live stadium map, and AI-generated operational recommendations.
+
+![Operations Overview](screenshots/overview.png)
+
+---
+
+### Zone Monitoring & Analytics
+
+Operators can drill into individual stadium zones to view occupancy, congestion levels, flow trends, and connected infrastructure.
+
+#### North Stand (Z1)
+
+![North Stand](screenshots/zone-z1.png)
+
+#### Food Court West (Z7)
+
+![Food Court West](screenshots/zone-z7.png)
+
+---
+
+### Multi-Zone Monitoring
+
+View operational status across all stadium zones simultaneously to identify emerging congestion risks and monitor crowd movement patterns.
+
+![Zones](screenshots/zones.png)
+
+---
+
+### Incident Management Timeline
+
+Centralized incident feed showing operational alerts, congestion events, weather incidents, and resolution workflows.
+
+![Incidents](screenshots/incidents.png)
+
+---
+
+### AI-Assisted Recommendations
+
+The AI Operations Engine analyzes current stadium conditions and generates structured recommendations with reasoning and confidence indicators.
+
+![AI Recommendations](screenshots/overview-ai.png)
+
+---
+
+### Crisis Simulation
+
+Operators can simulate operational scenarios such as weather disruptions, crowd surges, medical emergencies, network failures, and access restrictions.
+
+#### Rain Scenario
+
+![Rain Simulation](screenshots/rain-overview.png)
+
+#### Rain Generated Incidents
+
+![Rain Incidents](screenshots/rain-incidents.png)
 
 ---
 
